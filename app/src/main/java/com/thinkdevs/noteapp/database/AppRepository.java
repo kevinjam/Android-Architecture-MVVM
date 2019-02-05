@@ -56,5 +56,31 @@ public class AppRepository {
             }
         });
     }
+
+    public NoteEntity getNoteById(final int notedId) {
+
+        return  mDb.noteDao().getNotesById(notedId);
+
+
+    }
+
+    public void insertNote(final NoteEntity note) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.print("Notes ## " +note);
+                mDb.noteDao().insertNote(note);
+            }
+        });
+    }
+
+    public void deleteNote(final NoteEntity note) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.noteDao().deleteNotes(note);
+            }
+        });
+    }
     //endregion
 }

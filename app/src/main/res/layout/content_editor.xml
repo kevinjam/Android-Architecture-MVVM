@@ -15,6 +15,6 @@
         android:layout_margin="@dimen/text_margin"
         android:hint="@string/enter_notes"
         android:inputType="textMultiLine|textCapSentences"
-        android:text="@string/large_text" />
+         />
 
 </androidx.core.widget.NestedScrollView>
