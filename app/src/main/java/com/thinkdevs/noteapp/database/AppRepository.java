@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import androidx.lifecycle.LiveData;
+
 public class AppRepository {
     private static  AppRepository ourInstance;
-
-    public List<NoteEntity> mNotes;
+    public LiveData<List<NoteEntity>> mNotes;
     private AppDatabase mDb;
     private Executor executor = Executors.newSingleThreadExecutor();
 
@@ -24,17 +25,36 @@ public class AppRepository {
     }
 
     private AppRepository(Context context) {
-        mNotes = SampleData.getNotes();
         mDb = AppDatabase.getInstance(context);
+        mNotes = getAllNotes();
+
     }
 
     public void addSampleData() {
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                System.out.println("----- " +SampleData.getNotes());
+
                 mDb.noteDao().insertAll(SampleData.getNotes());
+
             }
         });
 
     }
+
+    private LiveData<List<NoteEntity>> getAllNotes(){
+        return mDb.noteDao().getAll();
+    }
+
+    //region Delete All NOtes
+    public void deleteAllNotes() {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.noteDao().deleteAll();
+            }
+        });
+    }
+    //endregion
 }

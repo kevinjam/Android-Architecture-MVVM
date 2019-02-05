@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,25 +61,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        notesData.addAll(mViewModel.mNotes);
-
-        for(NoteEntity note:notesData){
-            Log.i("Notes----", note.toString());
-        }
+//        notesData.addAll(mViewModel.mNotes);
+//
+//        for(NoteEntity note:notesData){
+//            Log.i("Notes----", note.toString());
+//        }
 
     }
 
     private void initViewModel() {
+        final Observer<List<NoteEntity>> notesObserver = new Observer<List<NoteEntity>>() {
+            @Override
+            public void onChanged(List<NoteEntity> noteEntities) {
+
+                notesData.clear();
+                notesData.addAll(noteEntities);
+
+                //adaoter
+                if(madapter == null){
+                    madapter = new NoteAdapter(notesData, MainActivity.this);
+                    recyclerView.setAdapter(madapter);
+                }else {
+                    madapter.notifyDataSetChanged();
+                }
+            }
+        };
+
+
         mViewModel = ViewModelProviders.of(this)
                 .get(MainViewModel.class);
+        mViewModel.mNotes.observe(this, notesObserver);
     }
 
     private void initRecyclerView() {
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        madapter = new NoteAdapter(notesData, this);
-        recyclerView.setAdapter(madapter);
+
     }
 
     @Override
@@ -99,9 +118,17 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_add_sample_data) {
             addSampledata();
             return true;
+        }else if(id == R.id.action_deleteAll){
+            deleteAllNotes();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAllNotes() {
+        mViewModel.deleteAllNotes();
+
     }
 
     //region ADD SAMPLE DATA
