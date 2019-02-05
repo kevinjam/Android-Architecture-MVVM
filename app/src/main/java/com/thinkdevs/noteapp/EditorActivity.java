@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import static com.thinkdevs.noteapp.utilities.Constants.EDITING_KEY;
 import static com.thinkdevs.noteapp.utilities.Constants.NOTE_ID_KEY;
 
 public class EditorActivity extends AppCompatActivity {
@@ -34,7 +35,11 @@ public class EditorActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         noteText = findViewById(R.id.note_text);
-        
+        if (savedInstanceState != null){
+            mEditing = savedInstanceState.getBoolean(NOTE_ID_KEY);
+
+        }
+
         initViewModel();
     }
 
@@ -45,7 +50,10 @@ public class EditorActivity extends AppCompatActivity {
         mViewmodel.mLiveNote.observe(this, new Observer<NoteEntity>() {
             @Override
             public void onChanged(NoteEntity noteEntity) {
-                noteText.setText(noteEntity.getText());
+                if (noteEntity != null && !mEditing){
+                    noteText.setText(noteEntity.getText());
+
+                }
             }
         });
 
@@ -99,5 +107,9 @@ saveAndReturn();    }
     }
 
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(EDITING_KEY, true);
+        super.onSaveInstanceState(outState);
+    }
 }
